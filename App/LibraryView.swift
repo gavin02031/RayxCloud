@@ -163,61 +163,108 @@ struct LibraryView: View {
 }
 
 extension LibraryView {
-    /// Search field with the filter button on its right.
+    /// Console-style navigation chrome around the existing search and filters.
     private var searchAndFilterBar: some View {
-        HStack(spacing: 10) {
-            if let activeShelf {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
                 Button {
-                    self.activeShelf = nil
+                    activeShelf = nil
+                    query = ""
+                    filter = LibraryFilter()
                 } label: {
-                    RoundIcon(symbol: "chevron.left")
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(red: 0.12, green: 0.51, blue: 0.17))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: "xmark")
+                                .font(.system(size: 19, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        Text("RAYXCLOUD")
+                            .font(.system(size: 16, weight: .black, design: .rounded))
+                            .tracking(1.0)
+                            .foregroundStyle(.white)
+                    }
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Back to home")
-                Text(activeShelf.title)
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                .accessibilityLabel("RayxCloud home")
+
+                Spacer(minLength: 5)
+
+                Text("CLOUD GAMING")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.55))
                     .lineLimit(1)
+
+                profileMenu
             }
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Search games", text: $query)
-                    .textFieldStyle(.plain)
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
-                    .autocorrectionDisabled()
-                    .submitLabel(.search)
-                if !query.isEmpty {
+
+            HStack(spacing: 10) {
+                if let activeShelf {
                     Button {
-                        query = ""
+                        self.activeShelf = nil
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
+                        Image(systemName: "chevron.left")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(Color.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .capsuleGlass()
+                    .accessibilityLabel("Back to home")
 
-            filterMenu
-            profileMenu
+                    Text(activeShelf.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
+
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.white.opacity(0.6))
+                    TextField("Search cloud games", text: $query)
+                        .textFieldStyle(.plain)
+#if os(iOS)
+                        .textInputAutocapitalization(.never)
+#endif
+                        .autocorrectionDisabled()
+                        .submitLabel(.search)
+                    if !query.isEmpty {
+                        Button {
+                            query = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Clear search")
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 9))
+
+                filterMenu
+            }
         }
 #if os(macOS)
         .padding(.leading, 16 + windowState.leadingInset)
         .padding(.trailing, 16)
         .padding(.top, 12)
-        .padding(.bottom, 10)
+        .padding(.bottom, 12)
 #else
         .padding(.horizontal, 16)
-        .padding(.top, 6)
-        .padding(.bottom, 10)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
 #endif
-        .background(.ultraThinMaterial)
-        .background(Color.black.opacity(0.6))
+        .background(Color(red: 0.055, green: 0.075, blue: 0.065))
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(.white.opacity(0.09))
+                .frame(height: 1)
+        }
     }
 
     private var profileMenu: some View {
