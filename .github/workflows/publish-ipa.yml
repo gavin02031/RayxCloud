@@ -62,9 +62,5 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --target "$SOURCE_SHA" \
             --title "RayxCloud Xbox Dashboard Preview 1 (Unsigned IPA)" \
-            --notes "Native Swift iOS preview featuring an Xbox-inspired dashboard. This is an unofficial community client, not affiliated with Microsoft or Xbox.
-
-**For GBox:** Download RayxCloud-unsigned.ipa directly from this release's Assets section. Do not download Source code (zip) or the Actions artifact. Import the IPA into GBox and sign with your own valid certificate before installation.
-
-**Important:** This IPA is **unsigned**. You must sign it to install on a normal iPhone. It supports eligible Xbox Cloud Gaming titles only and needs a compatible controller and eligible Microsoft subscription. Gameplay and device signing have not yet been validated for this fork. GPL-3.0; source is available in the linked commit." \
+            --notes "Unsigned native iOS preview with an Xbox-inspired dashboard. For GBox, download the RayxCloud-unsigned.ipa asset from this release (not Source code ZIP or an Actions artifact); import and sign it with a valid personal Apple signing certificate before installing. Requires eligible Xbox Cloud Gaming access and a physical controller. Unofficial client, not affiliated with Microsoft. Device gameplay remains unverified. GPL-3.0 source is linked." \
             --prerelease
