@@ -2,7 +2,7 @@ name: Build iOS IPA
 
 on:
   push:
-    branches: [main, feature/xbox-console-dashboard]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -14,9 +14,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  runner-diagnostic:
+    name: Check GitHub runner availability
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report runner assignment
+        run: |
+          echo "Linux runner assigned successfully."
+          echo "If the macOS job remains queued, examine macOS runner availability or account Actions restrictions."
+
   build-ios:
     name: Native iOS build and unsigned IPA
-    runs-on: macos-26
+    runs-on: macos-26-intel
     timeout-minutes: 60
     steps:
       - name: Check out source
