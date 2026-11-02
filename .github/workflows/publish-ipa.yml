@@ -1,0 +1,70 @@
+name: Publish IPA to Releases
+
+on:
+  push:
+    branches:
+      - feature/xbox-console-dashboard
+    paths:
+      - .github/workflows/publish-ipa.yml
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: Successful GitHub Actions build run ID
+        required: true
+        default: "41534287558"
+      release_tag:
+        description: GitHub release tag (must be new)
+        required: true
+        default: "v0.1.0-console-preview.1"
+      source_sha:
+        description: Source commit that produced the IPA
+        required: true
+        default: "f7d66490ad240d44bbc9c92f8e523d408f5c81e0"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    name: Publish directly downloadable IPA
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download successful build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RayxCloud-unsigned-ipa
+          run-id: ${{ inputs.artifact_run_id || '41534287558' }}
+          github-token: ${{ github.token }}
+          path: dist
+
+      - name: Verify IPA payload
+        run: |
+          set -euo pipefail
+          test -s dist/RayxCloud-unsigned.ipa
+          file dist/RayxCloud-unsigned.ipa
+          unzip -t dist/RayxCloud-unsigned.ipa | tail -n 2
+          ls -lh dist/RayxCloud-unsigned.ipa
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag || 'v0.1.0-console-preview.1' }}
+          SOURCE_SHA: ${{ inputs.source_sha || 'f7d66490ad240d44bbc9c92f8e523d408f5c81e0' }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists: $RELEASE_TAG"
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" dist/RayxCloud-unsigned.ipa \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --title "RayxCloud Xbox Dashboard Preview 1 (Unsigned IPA)" \
+            --notes "Native Swift iOS preview featuring an Xbox-inspired dashboard. This is an unofficial community client, not affiliated with Microsoft or Xbox.
+
+**For GBox:** Download RayxCloud-unsigned.ipa directly from this release's Assets section. Do not download Source code (zip) or the Actions artifact. Import the IPA into GBox and sign with your own valid certificate before installation.
+
+**Important:** This IPA is **unsigned**. You must sign it to install on a normal iPhone. It supports eligible Xbox Cloud Gaming titles only and needs a compatible controller and eligible Microsoft subscription. Gameplay and device signing have not yet been validated for this fork. GPL-3.0; source is available in the linked commit." \
+            --prerelease
